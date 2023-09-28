@@ -1,14 +1,18 @@
 import { Schema, model } from "mongoose";
+import * as hooks from '../hooks/user.hooks.js'
 
 const userSchema = new Schema({
-    firstName: {
+    name: {
         type: String,
         required: true,
         trim: true//delete space from first and end
     },
+    firstName: {
+        type: String,
+        trim: true
+    },
     lastName: {
         type: String,
-        required: true,
         trim: true
     },
     email: {
@@ -24,6 +28,7 @@ const userSchema = new Schema({
     },
     phone: {
         type: String,
+        trim: true
     },
     age: {
         type: Number,
@@ -32,11 +37,27 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
+    //?Add This Field To Save Code Last created to can logIn
+    confirmCode: {
+        type: String,
+        minlength: 4,
+        maxlength: 4,
+        required: true,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 },
     {
         timestamps: true,
     }
 )
+
+//!HOOKS
+//?TAKE USER FULL_NAME AND Split it to (first and last name).
+hooks.splitTheName(userSchema)
+
 
 const userModel = model('User', userSchema)
 
