@@ -8,6 +8,7 @@ const userRouter = Router()
 
 userRouter.route('/')
     .get(auth(), validation(validator.getUserProfile), userController.getUserProfile)
+    .put(auth(), validation(validator.updateProfile), userController.updateProfile)
 
 userRouter.post("/addProfilePicture", auth()
     , fileUpload(fileValidation.image).single('image'),
