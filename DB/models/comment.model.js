@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import * as hooks from '../hooks/comment.hooks.js'
 
 const commentSchema = new Schema({
     commentBody:{type:String, minlength:1,maxlength:300,required:true},
@@ -12,7 +13,7 @@ const commentSchema = new Schema({
     }
 )
 
-
+hooks.deleteOne_CommentH(commentSchema)
 
 
 const commentModel = model('Comment', commentSchema)

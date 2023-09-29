@@ -1,3 +1,6 @@
+import commentModel from "../models/comment.model";
+import replyCommentModel from "../models/commentReplay.model";
+import postModel from "../models/post.model";
 
 
 
@@ -15,5 +18,20 @@ export const splitTheName = (Schema) => {
             this.lastName=splitName[splitName.length - 1]
 
         done()
+    })
+}
+
+
+export const deleteOne_UserH= (Schema)=>{
+    Schema.post('deleteOne', { document: false, query: true } ,async function () {
+        await replyCommentModel.deleteMany({
+            createdBy: this.getQuery()._id
+        }),
+        await postModel.deleteMany({
+            createdBy: this.getQuery()._id
+        }),
+        await commentModel.deleteMany({
+            createdBy: this.getQuery()._id
+        })
     })
 }
