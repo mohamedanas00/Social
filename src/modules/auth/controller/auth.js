@@ -27,7 +27,6 @@ export const signUp = asyncHandler(async (req, res, next) => {
 
     const hashPassword = hash(password)
     const code = nanoid(4)
-    const confirmCode = code
     const html = emailHtml(code)
     sendEmail({ to: email, subject: "Confirm Email", html })
     const user = new userModel({
@@ -36,7 +35,7 @@ export const signUp = asyncHandler(async (req, res, next) => {
         password: hashPassword,
         phone,
         age,
-        confirmCode,
+        confirmCode:code,
     })
     await user.save()
     return res.status(StatusCodes.CREATED).json({ message: "Done", user })
