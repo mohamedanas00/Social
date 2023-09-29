@@ -9,25 +9,29 @@ import postModel from "../../../../DB/models/post.model.js";
 
 
 //*Add Comment to specific post 
-//*Check post is not Deleted
+//*Check post is not Deleted && and not delete in soft delete
 //*Check Post is public to have permission to make comment
 //*Check user is notDeleted
 export const addComment = asyncHandler(async (req, res, next) => {
     const { id } = req.params
     const createdBy = req.user._id
     const { commentBody } = req.body
-    const user = await userModel.findById(createdBy)
     const post = await postModel.findById(id)
 
     if (!post) {
         return next(new ErrorClass("Post is Not Exist!", StatusCodes.NOT_FOUND))
     }
+    if(post.isDeleted){
+        return next(new ErrorClass("Post is Deleted!", StatusCodes.NOT_FOUND))
+    }
     if (post.privacy == 'only') {
         return next(new ErrorClass("You Do not have permission to make comment in this post!", StatusCodes.UNAUTHORIZED))
     }
-    if (user.isDeleted) {
+
+    if (req.user.isDeleted) {
         return next(new ErrorClass("You can’t add comment", StatusCodes.UNAUTHORIZED))
     }
+
     const comment = await commentModel.create({
         commentBody,
         PostId: id,
