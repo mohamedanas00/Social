@@ -10,7 +10,7 @@ export const signUp = {
         password: generalFields.password.required(),
         cPassword: generalFields.cPassword.valid(joi.ref("password")).required(),
         phone: joi.string().trim().pattern(/^(010|012|011|015)\d{8}$/),
-        age:joi.string()
+        age:joi.string().min(13)
     }),
     query: joi.object().required().keys({}),
 }
