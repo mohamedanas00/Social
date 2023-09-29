@@ -8,7 +8,6 @@ import { ErrorClass } from "../../../utils/errorClass.js";
 import CryptoJS from "crypto-js";
 import { nanoid } from "nanoid";
 import { emailHtml, sendEmail } from "../../../utils/email.js";
-import { confirmEmail } from "../../auth/controller/auth.js";
 
 
 
@@ -19,6 +18,10 @@ export const addProfilePicture = asyncHandler(async (req, res, next) => {
     const id = req.user._id
     const user = await userModel.findById(id)
     const slug = slugify(user.name)
+    //*Delete previous  profilePicture from cloudinary
+    if(user.profilePicture){
+        await cloudinary.uploader.destroy(user.profilePicture.public_id)
+    }
     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `Social/User/${slug}/ProfilePicture` })
     const updateUser = await userModel.updateOne({ _id: id }, {
         profilePicture: { secure_url, public_id }
@@ -94,6 +97,7 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
 export const updateProfile = asyncHandler(async (req, res, next) => {
     const userID = req.user._id
     let { firstName ,lastName ,email, phone, age }=req.body
+    let messageEmail ='' 
     if(email){
         const isEmailExist = await userModel.findOne({ email: req.body.email })
         if (isEmailExist) {
@@ -107,6 +111,7 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
             confirmEmail:false,
             confirmCode:code,
         })
+        messageEmail=`Please Confirm your Email by code send in your mail ${code}`
     }
     if (phone) {
         phone = CryptoJS.AES.encrypt(phone, process.env.encrypt_key).toString()
@@ -118,5 +123,5 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
         phone,
         age
     })
-    return res.status(StatusCodes.OK).json({ message: "Done" })
+    return res.status(StatusCodes.OK).json({ message: "Done",Note:messageEmail })
 }) 
