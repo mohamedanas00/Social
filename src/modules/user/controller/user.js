@@ -5,6 +5,7 @@ import { asyncHandler } from "../../../utils/errorHandling.js"
 import { StatusCodes } from "http-status-codes";
 import { compare, hash } from "../../../utils/hashing.js";
 import { ErrorClass } from "../../../utils/errorClass.js";
+import CryptoJS from "crypto-js";
 
 
 
@@ -42,7 +43,8 @@ export const addCoverPictures = asyncHandler(async(req,res,next)=>{
 })
 
 
-//*soft delete(user must be logged in){ where data is not permanently removed from a database when it is deleted but is instead marked as deleted}
+//*soft delete(user must be logged in)
+//*{ where data is not permanently removed from a database when it is deleted but is instead marked as deleted}
 export const softDelete = asyncHandler(async (req, res, next) => {
     await userModel.updateOne({ _id: req.user._id }, { isDeleted: true });
     return res.status(StatusCodes.OK).json({ message: "Done" })
@@ -67,4 +69,20 @@ export const updatePassword =asyncHandler(async(req,res,next)=>{
     await userModel.updateOne({_id:id},{password:hashPassword})
     return res.status(StatusCodes.OK).json({ message: "Done" })
 
+})
+
+//*User Profile:Get all user Data(expected -password -confirmEmail -confirmCode) 
+export const getUserProfile = asyncHandler(async (req, res, next) => {
+    if (req.user.phone) {
+        req.user.phone = CryptoJS.AES.decrypt(req.user.phone, process.env.encrypt_key).toString(CryptoJS.enc.Utf8);
+    }
+    return res.status(StatusCodes.OK).json({
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        email: req.user.email,
+        phone: req.user.phone,
+        age:req.user.age,
+        profilePicture:req.user.profilePicture,
+        coverPictures:req.user.coverPictures
+    })
 })
