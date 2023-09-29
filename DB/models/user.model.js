@@ -37,6 +37,9 @@ const userSchema = new Schema({
         type: Boolean,
         default: false
     },
+    profilePicture: { type: Object  },
+    coverPictures: { type: Array },
+
     //?Add This Field To Save Code Last created to can logIn
     confirmCode: {
         type: String,

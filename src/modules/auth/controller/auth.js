@@ -79,13 +79,54 @@ export const logIn = asyncHandler(async (req, res, next) => {
         id: isExist._id,
         email: isExist.email
     }
+    await userModel.updateOne({ _id: isExist._id }, { isDeleted: false });
     //*Generate Token:to expire in 5min && RefreshToken expire in 6 months
     const token = generateToken(payload)
-    const RefreshToken=generateToken(payload)
+    const RefreshToken=generateRefreshToken(payload)
     return res.status(StatusCodes.ACCEPTED).json({ message: "Done",accessToken:token,RefreshToken:RefreshToken })
 })
 
 
 
+//*FORGETPASSWORD Using two EndPoints 1-sendCode to your mail /2-rest Your Password
+//!This code will not be accept after in 2min
+export const sendCode = asyncHandler(async (req, res, next) => {
+    const { email } = req.body
+    const isEmailExist = await userModel.findOne({ email })
+    if (!isEmailExist) {
+        return next(new ErrorClass(`This user not Exist!`, StatusCodes.NOT_FOUND))
+    }
+    const code = nanoid(4)
+    const html = emailHtml(code)
+    sendEmail({ to: email, subject: "Confirm Email", html })
+    await userModel.updateOne({ email }, {
+        confirmCode: code
+    })
+    return res.status(StatusCodes.ACCEPTED).json({ message: "Note,!This code will expire in 2min",CODE:code })
+})
+//*Enter your new Password
+export const restPassword = asyncHandler(async (req, res, next) => {
+    let { email, code, password } = req.body;
+    const isEmailExist = await userModel.findOne({ email })
+    if (!isEmailExist) {
+        return next(new ErrorClass(`This user not Exist!`, StatusCodes.NOT_FOUND))
+    }
+    //*Compare The last Update to schema with current time if time passed more than 2Min this code will not be accept
+    const updateAt =isEmailExist.updatedAt
+    const currentTime = Date.now();
+    const gapInMinutes = (currentTime - updateAt)/ (1000 * 60);
+
+    if (code != isEmailExist.confirmCode||gapInMinutes>=2) {
+        return next(new ErrorClass(`In-Valid code , please Send Code Again`, StatusCodes.BAD_REQUEST))
+    }
+
+    password = hash(password)
+    const newCode = nanoid(4)
+    await userModel.updateOne({ email }, {
+        password,
+        confirmCode: newCode
+    })
+    return res.status(StatusCodes.ACCEPTED).json({ message: "Done" })
+})
 
 

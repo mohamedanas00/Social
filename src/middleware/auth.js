@@ -4,11 +4,8 @@ import { asyncHandler } from "../utils/errorHandling.js";
 import jwt from "jsonwebtoken";
 import userModel from "../../DB/models/user.model.js";
 
-export const roles = {
-    user: 'user'
-}
-Object.freeze(roles)
-const auth = (userRoles = []) => {
+
+const auth = () => {
     return asyncHandler(async (req, res, next) => {
         const { authenticated } = req.headers;
         if (!authenticated?.startsWith(process.env.BEARER_KEY)) {
@@ -25,10 +22,6 @@ const auth = (userRoles = []) => {
         const authUser = await userModel.findOne({ _id: decode.id })
         if (!authUser) {
             return next(new ErrorClass("Not Register account", StatusCodes.NOT_FOUND))
-        }
-        //authorization
-        if (!userRoles.includes(authUser.role)) {
-            return next(new ErrorClass("Permission Denied🚫!", StatusCodes.UNAUTHORIZED))
         }
         req.user = authUser
         return next()
