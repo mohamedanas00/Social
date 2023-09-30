@@ -17,5 +17,5 @@ initApp(app,express)
 const port = +process.env.PORT
 app.listen(port, () => console.log(`App listening on port:${port}!`))
 
-//*function that runs everyday at 9:00 *pm and send a reminder email to all users didn’t confirm their emails to warn them from delete their accounts*
+//!function that runs everyday at 9:00 *pm and send a reminder email to all users didn’t confirm their emails to warn them from delete their accounts*
 const reminderJob = scheduler.scheduleJob('0 0 21 * * *', sendReminderEmails);

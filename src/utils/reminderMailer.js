@@ -202,7 +202,8 @@ export const emailReminderHtml = (Text) => {
 }
 
 
-
+//!function that runs everyday at 9:00 *pm and send a reminder email to all users didn’t confirm 
+//!their emails to warn them from delete their accounts*
 export const sendReminderEmails = async() => {
     try {
         const users =await userModel.find({confirmEmail:false})
