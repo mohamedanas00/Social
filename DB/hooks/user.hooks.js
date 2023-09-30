@@ -4,7 +4,7 @@ import postModel from "../models/post.model.js";
 
 
 
-
+//*hook to split name to first name and last name before saving
 export const splitTheName = (Schema) => {
     Schema.pre('save', async function (done) {
             const name = this.name
@@ -21,7 +21,7 @@ export const splitTheName = (Schema) => {
     })
 }
 
-//*delete All posts with (comments and reply Comments) for this user
+//*if user deleted => delete All posts with (comments and reply Comments) for this user
 export const deleteOne_UserH= (Schema)=>{
     Schema.post('deleteOne', { document: false, query: true } ,async function () {
         await replyCommentModel.deleteMany({
