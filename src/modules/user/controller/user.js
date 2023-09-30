@@ -8,6 +8,7 @@ import { ErrorClass } from "../../../utils/errorClass.js";
 import CryptoJS from "crypto-js";
 import { nanoid } from "nanoid";
 import { emailHtml, sendEmail } from "../../../utils/email.js";
+import postModel from "../../../../DB/models/post.model.js";
 
 
 
@@ -19,7 +20,7 @@ export const addProfilePicture = asyncHandler(async (req, res, next) => {
     const user = await userModel.findById(id)
     const slug = slugify(user.name)
     //*Delete previous  profilePicture from cloudinary
-    if(user.profilePicture){
+    if (user.profilePicture) {
         await cloudinary.uploader.destroy(user.profilePicture.public_id)
     }
     const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `Social/User/${slug}/ProfilePicture` })
@@ -96,9 +97,9 @@ export const getUserProfile = asyncHandler(async (req, res, next) => {
 //*Update user Profile:Update{ name ,email, phone, age } 
 export const updateProfile = asyncHandler(async (req, res, next) => {
     const userID = req.user._id
-    let { firstName ,lastName ,email, phone, age }=req.body
-    let messageEmail ='' 
-    if(email){
+    let { firstName, lastName, email, phone, age } = req.body
+    let messageEmail = ''
+    if (email) {
         const isEmailExist = await userModel.findOne({ email: req.body.email })
         if (isEmailExist) {
             return next(new ErrorClass(`This email:"${req.body.email}" Already Exist!`, StatusCodes.CONFLICT))
@@ -106,12 +107,12 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
         const code = nanoid(4)
         const html = emailHtml(code)
         sendEmail({ to: email, subject: "Confirm Email", html })
-        await userModel.findByIdAndUpdate(userID,{
+        await userModel.findByIdAndUpdate(userID, {
             email,
-            confirmEmail:false,
-            confirmCode:code,
+            confirmEmail: false,
+            confirmCode: code,
         })
-        messageEmail=`Please Confirm your Email by code send in your mail ${code}`
+        messageEmail = `Please Confirm your NewEmail by code send in your mail ${code}`
     }
     if (phone) {
         phone = CryptoJS.AES.encrypt(phone, process.env.encrypt_key).toString()
@@ -119,9 +120,57 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
     await userModel.findOneAndUpdate({ _id: userID }, {
         firstName,
         lastName,
-        name:firstName+' '+lastName,
+        name: firstName + ' ' + lastName,
         phone,
         age
     })
-    return res.status(StatusCodes.OK).json({ message: "Done",Note:messageEmail })
-}) 
+    return res.status(StatusCodes.OK).json({ message: "Done", NoteThat: messageEmail })
+})
+
+//*User add video for his posts 
+export const addVideoForPost = asyncHandler(async (req, res, next) => {
+    const { id } = req.params
+    const userId = req.user._id
+    const slug = slugify(req.user.name)
+
+    const post = await postModel.findById(id)
+
+    if (!post) {
+        return next(new ErrorClass(`Post Not Exist`), StatusCodes.NOT_FOUND)
+    }
+
+    if (post.isDeleted) {
+        return next(new ErrorClass(`Post is Deleted`), StatusCodes.NOT_FOUND)
+    }
+
+    if (post.createdBy.toString() != userId.toString()) {
+        return next(new ErrorClass(`You do not have permission to do this`), StatusCodes.UNAUTHORIZED)
+    }
+    const vidoSize = req.file.path.size
+    const MB = vidoSize / (1024 * 1024)
+    if (MB > 50) {
+        return next(new ErrorClass(`This Video is very large,The Max Size Of Video is 50MB`), StatusCodes.NOT_ACCEPTABLE)
+    }
+    const uploadOptions = {
+        resource_type: "video",
+        folder: `Social/posts/${slug}/postsVideos`,
+        //* the maximum file size
+        max_file_size: 50 * 1024 * 1024, // 50 MB
+
+        //* the maximum duration 
+        max_video_duration: 60, // 60 seconds
+
+        //* frame rate for the video
+        max_allowed_frame_rate: 30, // 30 frames per second
+    };
+    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, uploadOptions)
+    req.body.video = { secure_url, public_id }
+
+    const newPost = await postModel.findByIdAndUpdate(id, {
+        video: req.body.video,
+    }, {
+        new: true,
+    })
+    res.status(StatusCodes.OK).json({ message: "Done", newPost })
+
+})

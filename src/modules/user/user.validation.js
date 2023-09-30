@@ -51,3 +51,12 @@ export const updateProfile = {
     }).required(),
     query: joi.object().required().keys({}),
 }
+
+
+export const addVideoForPost = {
+    params: joi.object({
+        id:generalFields.id.required()
+    }).required(),
+    body: joi.object().required(),
+    query: joi.object().required().keys({}),
+}

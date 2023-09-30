@@ -10,6 +10,11 @@ userRouter.route('/')
     .get(auth(), validation(validator.getUserProfile), userController.getUserProfile)
     .put(auth(), validation(validator.updateProfile), userController.updateProfile)
 
+userRouter.route('/:id')
+    .patch(auth(),fileUpload(fileValidation.video).single('video'),
+    validation(validator.addVideoForPost),
+    userController.addVideoForPost)
+
 userRouter.post("/addProfilePicture", auth()
     , fileUpload(fileValidation.image).single('image'),
     validation(validator.addProfilePicture),

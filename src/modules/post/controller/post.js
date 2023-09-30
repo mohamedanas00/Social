@@ -59,6 +59,11 @@ export const updatePost = asyncHandler(async (req, res, next) => {
         return next(new ErrorClass(`Post Not Exist`), StatusCodes.NOT_FOUND)
     }
 
+    
+    if (post.isDeleted) {
+        return next(new ErrorClass(`Post is Deleted`), StatusCodes.NOT_FOUND)
+    }
+    
     if (post.createdBy.toString() != userId.toString()) {
         return next(new ErrorClass(`You do not have permission to do this`), StatusCodes.UNAUTHORIZED)
     }
