@@ -5,6 +5,7 @@ import auth from "../../middleware/auth.js";
 import { validation } from "../../middleware/validation.js";
 import * as validator from './user.validation.js'
 const userRouter = Router()
+userRouter.patch('/updatePassword', auth(), validation(validator.updatePassword), userController.updatePassword)
 
 userRouter.route('/')
     .get(auth(), validation(validator.getUserProfile), userController.getUserProfile)
@@ -27,7 +28,6 @@ userRouter.post("/addCoverPictures", auth()
     userController.addCoverPictures)
 
 
-userRouter.patch('/updatePassword', auth(), validation(validator.updatePassword), userController.updatePassword)
 userRouter.put('/softDelete',auth(),userController.softDelete)
 
 

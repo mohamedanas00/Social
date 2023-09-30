@@ -80,10 +80,11 @@ export const logIn = asyncHandler(async (req, res, next) => {
         email: isExist.email
     }
     await userModel.updateOne({ _id: isExist._id }, { isDeleted: false });
-    //*Generate Token:to expire in 5min && RefreshToken expire in 6 months
+    //*Generate Token:to expire in 5min
     const token = generateToken(payload)
-    const RefreshToken=generateRefreshToken(payload)
-    return res.status(StatusCodes.ACCEPTED).json({ message: "Done",accessToken:token,RefreshToken:RefreshToken })
+    isExist.token=token
+    await isExist.save()
+    return res.status(StatusCodes.ACCEPTED).json({ message: "Done!Note:Token Expire in 3min",accessToken:token })
 })
 
 

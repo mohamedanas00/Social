@@ -51,6 +51,9 @@ const userSchema = new Schema({
     isDeleted: {
         type: Boolean,
         default: false
+    },
+    token:{
+        type:String,
     }
 },
     {
