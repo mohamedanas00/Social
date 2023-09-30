@@ -21,7 +21,7 @@ export const splitTheName = (Schema) => {
     })
 }
 
-
+//*delete All posts with (comments and reply Comments) for this user
 export const deleteOne_UserH= (Schema)=>{
     Schema.post('deleteOne', { document: false, query: true } ,async function () {
         await replyCommentModel.deleteMany({
