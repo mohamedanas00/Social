@@ -1,6 +1,6 @@
-import commentModel from "../models/comment.model";
-import replyCommentModel from "../models/commentReplay.model";
-import postModel from "../models/post.model";
+import commentModel from "../models/comment.model.js";
+import replyCommentModel from "../models/commentReplay.model.js";
+import postModel from "../models/post.model.js";
 
 
 

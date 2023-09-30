@@ -52,4 +52,28 @@ export class ApiFeatures {
         }
         return this
     }
+
+    sort() {
+        //3-sort
+        if (this.queryString.sort) {
+            let sortBy = this.queryString.sort.split(',').join(' ')
+            this.mongooseQuery.sort(sortBy)
+        }
+        return this
+    }
+
+    search() {
+
+        //search
+        if (this.queryString.keyword) {
+            this.mongooseQuery.find({
+                $or: [
+                    { name: { $regex: this.queryString.keyword, $options: 'i' } },
+                    { description: { $regex: this.queryString.keyword, $options: 'i' } }
+                ]
+            })
+
+        }
+        return this
+    }
 }

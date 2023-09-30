@@ -72,6 +72,7 @@ export const updateComment = asyncHandler(async (req, res, next) => {
 
 //*delete Comment 
 //*Check comment is Exist and deleted by owner only
+//!Note that I use  hooks to delete => all reply comment for this comment
 export const deleteComment = asyncHandler(async (req, res, next) => {
     const { id } = req.params
     const userID = req.user._id
