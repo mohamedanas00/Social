@@ -6,7 +6,7 @@ const commentSchema = new Schema({
     createdBy:{type: Schema.Types.ObjectId, ref: 'User',  required: true},
     PostId:{type: Schema.Types.ObjectId, ref: 'Post',  required: true},
     replies:[{ replyId: {  type: Schema.Types.ObjectId, ref: 'Reply',  required: true},}],
-    likes:[{  userId: {  type: Schema.Types.ObjectId, ref: 'User',  required: true ,unique: true},}],
+    likes:[{  userId: {  type: Schema.Types.ObjectId, ref: 'User',  required: true},}],
 },
     {
         timestamps: true,
