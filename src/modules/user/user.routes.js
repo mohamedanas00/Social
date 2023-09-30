@@ -28,7 +28,7 @@ userRouter.post("/addCoverPictures", auth()
 
 
 userRouter.patch('/updatePassword', auth(), validation(validator.updatePassword), userController.updatePassword)
-userRouter.patch('/softDelete', auth(), validation(validator.softDelete), userController.softDelete)
+userRouter.put('/softDelete',auth(),userController.softDelete)
 
 
 export default userRouter

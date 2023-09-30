@@ -52,7 +52,9 @@ export const addCoverPictures = asyncHandler(async (req, res, next) => {
 //*soft delete(user must be logged in)
 //*{ where data is not permanently removed from a database when it is deleted but is instead marked as deleted}
 export const softDelete = asyncHandler(async (req, res, next) => {
-    await userModel.updateOne({ _id: req.user._id }, { isDeleted: true });
+    console.log("7mbozo akl bozo");
+    const id = req.user._id
+    await userModel.updateOne({ _id: id }, { isDeleted: true });
     return res.status(StatusCodes.OK).json({ message: "Done" })
 })
 

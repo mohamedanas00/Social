@@ -58,7 +58,7 @@ export const updateReplyComment = asyncHandler(async(req,res,next)=>{
     const userID = req.user._id
     const { replyBody } = req.body
     const replyComment = await replyCommentModel.findById(id)
-   
+
     if (!replyComment) {
         return next(new ErrorClass("Reply comment is Not Exist!", StatusCodes.NOT_FOUND))
     }
@@ -80,7 +80,7 @@ export const updateReplyComment = asyncHandler(async(req,res,next)=>{
     await replyComment.save()
 
 
-    return res.status(StatusCodes.OK).json({ message: "Done", comment })
+    return res.status(StatusCodes.OK).json({ message: "Done", replyComment })
 }) 
 
 

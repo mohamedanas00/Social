@@ -11,6 +11,7 @@ import { generateToken, generateRefreshToken } from './../../../utils/generateAn
 
 
 //*SignUp:{TakeUserData - Hash user password#️⃣ - encrypt user phone📲 - send confirmation email📨}
+//!Note that i use hook to split name to first-last
 export const signUp = asyncHandler(async (req, res, next) => {
     let { name, email, password, cPassword, phone, age } = req.body
     const isEmailExist = await userModel.findOne({ email: email })
